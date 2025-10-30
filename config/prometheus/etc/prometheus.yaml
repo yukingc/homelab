@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'navidrome'
+    metrics_path: '/navidrome/metrics'
+    static_configs:
+      - targets: ['navidrome:4533']  # Enable metrics in Navidrome for this
+
+# Optionally add:
+#  - job_name: 'cadvisor'
+#    static_configs:
+#      - targets: ['cadvisor:8080']

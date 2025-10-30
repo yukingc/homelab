@@ -1,0 +1,22 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=501
+      - PGID=20
+    volumes:
+      - ${DATA_ROOT}/jellyfin/config:/config
+      - ${DATA_ROOT}/jellyfin/cache:/cache
+      - ${MEDIA_ROOT}:/media
+    networks:
+      - homelab-net
+    restart: unless-stopped
+    expose:
+      - "8096"  # Jellyfin's default HTTP port
+    ports:
+      - "8096:8096"  # for localhost access
+
+networks:
+  homelab-net:
+    external: true

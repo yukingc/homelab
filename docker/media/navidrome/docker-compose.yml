@@ -1,0 +1,27 @@
+services:
+  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome
+    user: "501:20"  # Replace with your PUID and PGID if different
+    environment:
+      - ND_SCANINTERVAL=1m
+      - ND_LOGLEVEL=info
+      - ND_SESSIONTIMEOUT=24h
+      - ND_MUSICFOLDER=/music
+      - ND_BASEURL=/navidrome
+      - ND_PROMETHEUS_ENABLED=true
+#      - ND_PROMETHEUS_METRICSPATH=/metrics
+    volumes:
+      - ${DATA_ROOT}/navidrome:/data
+      - ${MUSIC_ROOT}:/music
+    networks:
+      - homelab-net
+    restart: unless-stopped
+    expose:
+      - "4533"  # Internal port for reverse proxy
+    ports:
+      - "4533:4533"  # Optional, if you want to access it directly via localhost
+
+networks:
+  homelab-net:
+    external: true
