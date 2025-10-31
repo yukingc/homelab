@@ -6,6 +6,7 @@ services:
       - ${CONFIG_ROOT}/nginx/conf.d:/etc/nginx/conf.d
       - ${DATA_ROOT}/certbot/conf:/etc/letsencrypt
       - ${DATA_ROOT}/certbot/www:/var/www/certbot
+      - ${HOMELAB_ROOT}/docker/reverse-proxy/html:/var/www/home:ro
     networks:
       - homelab-net
     # depends_on:
@@ -14,6 +15,17 @@ services:
     ports:
       - "80:80"
       - "443:443"
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    volumes:
+      - ${DATA_ROOT}/certbot/conf:/etc/letsencrypt
+      - ${DATA_ROOT}/certbot/www:/var/www/certbot
+    networks:
+      - homelab-net
+    restart: unless-stopped
 
   nginx-init:
     image: nginx:latest
@@ -48,17 +60,6 @@ services:
     restart: "no"
     profiles:
       - init
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    volumes:
-      - ${DATA_ROOT}/certbot/conf:/etc/letsencrypt
-      - ${DATA_ROOT}/certbot/www:/var/www/certbot
-    networks:
-      - homelab-net
-    restart: unless-stopped
 
 networks:
   homelab-net:
