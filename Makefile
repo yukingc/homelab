@@ -16,7 +16,7 @@ ROOT_DIR := $(shell git rev-parse --show-toplevel)
 SERVICE_DIRS := \
 	docker/media/jellyfin \
 	docker/media/navidrome \
-	docker/media/calibre-web \
+	docker/media/calibre-web-automated \
 	docker/monitoring/prometheus \
 	docker/monitoring/grafana \
 	docker/nextcloud \
