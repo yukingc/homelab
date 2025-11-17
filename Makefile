@@ -76,4 +76,4 @@ reverse-proxy-up: network-setup
 		echo "Certificate already exists. Skipping certbot-init."; \
 	fi
 	@echo "Starting Nginx and Certbot services..."
-	@docker compose -f docker/reverse-proxy/docker-compose.yml --env-file $(ROOT_DIR)/.env up -d nginx certbot
+	@docker compose -f docker/reverse-proxy/docker-compose.yml --env-file $(ROOT_DIR)/.env up -d nginx certbot modsecurity
