@@ -1,0 +1,45 @@
+services:
+  tailscale-stirling-pdf:
+    image: tailscale/tailscale:latest
+    container_name: ts-stirling-pdf
+    hostname: stirling
+    environment:
+      - TS_AUTHKEY=tskey-auth-kTBghTT1aC21CNTRL-EehKAiMHJqU1mWDjk8zcqUNt7FFExzs4
+      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/config/stirling-pdf.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ts-stirling-pdf:/var/lib/tailscale
+      - ${CONFIG_ROOT}/tailscale/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    # expose:
+    #   - "8080"
+    # ports:
+    #   - "8081:8080"
+    volumes:
+      - ${DATA_ROOT}/StirlingPDF/trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - ${DATA_ROOT}/StirlingPDF/extraConfigs:/configs
+      - ${DATA_ROOT}/StirlingPDF/customFiles:/customFiles/
+      - ${DATA_ROOT}/StirlingPDF/logs:/logs/
+      - ${DATA_ROOT}/StirlingPDF/pipeline:/pipeline/
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - LANGS=en_GB
+    network_mode: service:tailscale-stirling-pdf
+    # networks:
+    #   - homelab-net
+
+volumes:
+  ts-stirling-pdf:
+    driver: local
+
+# networks:
+#   homelab-net:
+#     external: true

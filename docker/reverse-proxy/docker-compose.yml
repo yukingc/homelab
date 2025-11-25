@@ -18,7 +18,7 @@ services:
       # Logs
       - ${DATA_ROOT}/modsecurity/logs:/var/log/modsecurity
     environment:
-      - PROXY_PASS=http://nginx:8080
+      - PROXY_PASS=http://nginx:8082
     depends_on:
       - nginx
     networks:
@@ -29,7 +29,7 @@ services:
     image: nginx:latest
     container_name: nginx
     expose:
-      - "8080"
+      - "8082"
     volumes:
       - ${CONFIG_ROOT}/nginx/conf.d:/etc/nginx/conf.d
       - ${DATA_ROOT}/certbot/conf:/etc/letsencrypt
@@ -37,8 +37,8 @@ services:
       - ${HOMELAB_ROOT}/docker/reverse-proxy/html:/var/www/home:ro
     networks:
       - homelab-net
-    # depends_on:
-    #   - jellyfin
+      # - navidrome_default
+      # - calibre-web-automated_default
     restart: unless-stopped
 
   certbot:
@@ -89,3 +89,7 @@ services:
 networks:
   homelab-net:
     external: true
+  # navidrome_default:
+  #   external: true
+  # calibre-web-automated_default:
+  #   external: true

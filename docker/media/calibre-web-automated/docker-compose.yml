@@ -1,4 +1,22 @@
 services:
+  tailscale-cwa:
+    image: tailscale/tailscale:latest
+    container_name: ts-cwa
+    hostname: calibre
+    environment:
+      - TS_AUTHKEY=tskey-auth-kTBghTT1aC21CNTRL-EehKAiMHJqU1mWDjk8zcqUNt7FFExzs4
+      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/config/calibre-web-automated.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ts-cwa:/var/lib/tailscale
+      - ${CONFIG_ROOT}/tailscale/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:latest
     container_name: calibre-web-automated
@@ -14,13 +32,19 @@ services:
       - "${MEDIA_ROOT}/Calibre Web Automated/cwa-book-ingest:/cwa-book-ingest"
       # If you don't have an existing library, CWA will automatically create one at the bind provided here
       - "${MEDIA_ROOT}/Calibre Web Automated/calibre-library:/calibre-library"
-    networks:
-      - homelab-net
-    ports:
-      # Change the first number to change the port you want to access the Web UI, not the second
-      - 8083:8083 
+    depends_on:
+      - tailscale-cwa
+    network_mode: service:tailscale-cwa
+    # networks:
+    #   - homelab-net
+    # ports:
+    #   - 8083:8083 
     restart: unless-stopped
 
-networks:
-  homelab-net:
-    external: true
+volumes:
+  ts-cwa:
+    driver: local
+
+# networks:
+#   homelab-net:
+#     external: true

@@ -20,7 +20,9 @@ SERVICE_DIRS := \
 	docker/monitoring/prometheus \
 	docker/monitoring/grafana \
 	docker/nextcloud \
+	docker/stirling-pdf \
 	docker/reverse-proxy
+# 	docker/caddy
 
 # Helper function to get a friendly service name from path
 define service_name
@@ -59,6 +61,8 @@ restart: down up
 # Generate per-service targets like jellyfin-up, navidrome-up
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d))
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down-vol: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down -v))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-logs: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f))
 
 include .env # for DATA_ROOT used below
 
