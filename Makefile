@@ -60,9 +60,11 @@ restart: down up
 
 # Generate per-service targets like jellyfin-up, navidrome-up
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up-force: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d --force-recreate))
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down))
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down-vol: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down -v))
 $(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-logs: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-pull: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env pull))
 
 include .env # for DATA_ROOT used below
 
