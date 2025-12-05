@@ -28,7 +28,7 @@ services:
       - ND_LOGLEVEL=info
       - ND_SESSIONTIMEOUT=24h
       - ND_MUSICFOLDER=/music
-      - ND_BASEURL=/navidrome
+      # - ND_BASEURL=/navidrome
       - ND_PROMETHEUS_ENABLED=true
 #      - ND_PROMETHEUS_METRICSPATH=/metrics
     volumes:
