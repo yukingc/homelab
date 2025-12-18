@@ -33,6 +33,7 @@ services:
       - DISABLE_ADDITIONAL_FEATURES=false
       - LANGS=en_GB
     network_mode: service:tailscale-stirling-pdf
+    restart: unless-stopped
     # networks:
     #   - homelab-net
 
