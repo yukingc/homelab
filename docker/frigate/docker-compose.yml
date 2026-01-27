@@ -1,0 +1,33 @@
+services:
+  frigate:
+    container_name: frigate
+    # privileged: true # this may not be necessary for all setups
+    restart: unless-stopped
+    stop_grace_period: 30s # allow enough time to shut down the various services
+    image: ghcr.io/blakeblackshear/frigate:stable
+    shm_size: "256mb" # update for your cameras based on calculation above
+    # devices:
+    #   - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
+    #   - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://github.com/jnicolson/gasket-builder
+    #   - /dev/video11:/dev/video11 # For Raspberry Pi 4B
+    #   - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${DATA_ROOT}/frigate/config:/config
+      - ${DATA_ROOT}/frigate/media:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+      - ${DATA_ROOT}/frigate/go2rtc/certs:/certs:ro # Optional:for secure RTSP/WebRTC connections
+    ports:
+      - "8971:8971"
+      - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+      - "1984:1984"     # go2rtc UI
+      - "0.0.0.0:1935:1935"     # go2rtc RTMP feeds
+      - "8890:8890/udp" # SRT feeds
+    environment:
+      FRIGATE_RTSP_PASSWORD: "password"

@@ -21,6 +21,7 @@ SERVICE_DIRS := \
 	docker/monitoring/grafana \
 	docker/nextcloud \
 	docker/stirling-pdf \
+	docker/frigate \
 	docker/reverse-proxy
 # 	docker/caddy
 
