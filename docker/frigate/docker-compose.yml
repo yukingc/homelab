@@ -1,4 +1,22 @@
 services:
+  tailscale-frigate:
+    image: tailscale/tailscale:latest
+    container_name: ts-frigate
+    hostname: frigate
+    environment:
+      - TS_AUTHKEY=tskey-auth-kTBghTT1aC21CNTRL-EehKAiMHJqU1mWDjk8zcqUNt7FFExzs4
+      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/config/frigate.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ts-frigate:/var/lib/tailscale
+      - ${CONFIG_ROOT}/tailscale/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
   frigate:
     container_name: frigate
     # privileged: true # this may not be necessary for all setups
@@ -20,14 +38,21 @@ services:
         tmpfs:
           size: 1000000000
       - ${DATA_ROOT}/frigate/go2rtc/certs:/certs:ro # Optional:for secure RTSP/WebRTC connections
-    ports:
-      - "8971:8971"
-      - "5000:5000" # Internal unauthenticated access. Expose carefully.
-      - "8554:8554" # RTSP feeds
-      - "8555:8555/tcp" # WebRTC over tcp
-      - "8555:8555/udp" # WebRTC over udp
-      - "1984:1984"     # go2rtc UI
-      - "0.0.0.0:1935:1935"     # go2rtc RTMP feeds
-      - "8890:8890/udp" # SRT feeds
+    # ports:
+      # - "8971:8971"
+      # - "5000:5000" # Internal unauthenticated access. Expose carefully.
+      # - "8554:8554" # RTSP feeds
+      # - "8555:8555/tcp" # WebRTC over tcp
+      # - "8555:8555/udp" # WebRTC over udp
+      # - "1984:1984"     # go2rtc UI
+      # - "0.0.0.0:1935:1935"     # go2rtc RTMP feeds
+      # - "8890:8890/udp" # SRT feeds
     environment:
       FRIGATE_RTSP_PASSWORD: "password"
+    depends_on:
+      - tailscale-frigate
+    network_mode: service:tailscale-frigate
+
+volumes:
+  ts-frigate:
+    driver: local
