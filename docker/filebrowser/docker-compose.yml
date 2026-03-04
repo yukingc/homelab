@@ -4,7 +4,7 @@ services:
     container_name: ts-filebrowser
     hostname: filebrowser
     environment:
-      - TS_AUTHKEY=tskey-auth-kUqTu9UiGa11CNTRL-ERYHAEMR2vJ9Sd677uDnuJYEiBNREnECe
+      - TS_AUTHKEY=${TS_AUTHKEY}
       # - TS_EXTRA_ARGS=--advertise-tags=tag:container
       - TS_SERVE_CONFIG=/config/filebrowser.json
       - TS_STATE_DIR=/var/lib/tailscale

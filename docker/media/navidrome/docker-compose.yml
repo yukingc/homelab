@@ -4,7 +4,7 @@ services:
     container_name: ts-navidrome
     hostname: navidrome
     environment:
-      - TS_AUTHKEY=tskey-auth-kUqTu9UiGa11CNTRL-ERYHAEMR2vJ9Sd677uDnuJYEiBNREnECe
+      - TS_AUTHKEY=${TS_AUTHKEY}
       # - TS_EXTRA_ARGS=--advertise-tags=tag:container
       - TS_SERVE_CONFIG=/config/navidrome.json
       - TS_STATE_DIR=/var/lib/tailscale
