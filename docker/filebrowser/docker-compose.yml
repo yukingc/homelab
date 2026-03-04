@@ -1,0 +1,50 @@
+services:
+  tailscale-filebrowser:
+    image: tailscale/tailscale:latest
+    container_name: ts-filebrowser
+    hostname: filebrowser
+    environment:
+      - TS_AUTHKEY=tskey-auth-kUqTu9UiGa11CNTRL-ERYHAEMR2vJ9Sd677uDnuJYEiBNREnECe
+      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/config/filebrowser.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ts-filebrowser:/var/lib/tailscale
+      - ${CONFIG_ROOT}/tailscale/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    container_name: filebrowser
+    # environment:
+      # - PUID=501
+      # - PGID=20
+      # Edit to match your current timezone https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      # - TZ=UTC 
+    command: ["--database", "/database/filebrowser.db", "--config", "/config/filebrowser.json"]
+    volumes:
+      - ${CONFIG_ROOT}/filebrowser:/config
+      - /Users/piusyu/Public/Statements:/srv/Statements
+      - filebrowser_database:/database
+    depends_on:
+      - tailscale-filebrowser
+    network_mode: service:tailscale-filebrowser
+    # networks:
+    #   - homelab-net
+    # ports:
+    #   - 8083:8083 
+    restart: unless-stopped
+
+volumes:
+  ts-filebrowser:
+    driver: local
+  filebrowser_database:
+    driver: local
+
+# networks:
+#   homelab-net:
+#     external: true

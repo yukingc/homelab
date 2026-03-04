@@ -22,7 +22,8 @@ SERVICE_DIRS := \
 	docker/nextcloud \
 	docker/stirling-pdf \
 	docker/frigate \
-	docker/reverse-proxy
+	docker/reverse-proxy \
+	docker/filebrowser
 # 	docker/caddy
 
 # Helper function to get a friendly service name from path
