@@ -23,7 +23,8 @@ SERVICE_DIRS := \
 	docker/stirling-pdf \
 	docker/frigate \
 	docker/reverse-proxy \
-	docker/filebrowser
+	docker/filebrowser \
+	docker/portainer \
 # 	docker/caddy
 
 # Helper function to get a friendly service name from path
