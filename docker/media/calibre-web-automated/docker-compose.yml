@@ -8,14 +8,9 @@ services:
       # - TS_EXTRA_ARGS=--advertise-tags=tag:container
       - TS_SERVE_CONFIG=/config/calibre-web-automated.json
       - TS_STATE_DIR=/var/lib/tailscale
-      - TS_USERSPACE=false
     volumes:
       - ts-cwa:/var/lib/tailscale
       - ${CONFIG_ROOT}/tailscale/config:/config
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    cap_add:
-      - net_admin
     restart: unless-stopped
   calibre-web-automated:
     image: crocodilestick/calibre-web-automated:latest
