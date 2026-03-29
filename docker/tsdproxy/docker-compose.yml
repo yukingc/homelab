@@ -1,0 +1,21 @@
+services:
+  tsdproxy:
+    image: almeidapaulopt/tsdproxy:1
+    # environment:
+      # - TS_AUTHKEY=${TS_AUTHKEY}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - datadir:/data
+      - ${CONFIG_ROOT}/tsdproxy:/config
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - homelab-net
+    
+volumes:
+  datadir:
+
+networks:
+  homelab-net:
+    external: true

@@ -25,6 +25,7 @@ SERVICE_DIRS := \
 	docker/reverse-proxy \
 	docker/filebrowser \
 	docker/portainer \
+	docker/tsdproxy \
 # 	docker/caddy
 
 # Helper function to get a friendly service name from path
