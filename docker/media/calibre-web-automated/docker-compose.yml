@@ -21,6 +21,7 @@ services:
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
+      tsdproxy.name: "calibre"
 
 volumes:
   ts-cwa:
