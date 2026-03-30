@@ -1,17 +1,4 @@
 services:
-  tailscale-frigate:
-    image: tailscale/tailscale:latest
-    container_name: ts-frigate
-    hostname: frigate
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
-      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_SERVE_CONFIG=/config/frigate.json
-      - TS_STATE_DIR=/var/lib/tailscale
-    volumes:
-      - ts-frigate:/var/lib/tailscale
-      - ${CONFIG_ROOT}/tailscale/config:/config
-    restart: unless-stopped
   frigate:
     container_name: frigate
     # privileged: true # this may not be necessary for all setups
@@ -44,10 +31,12 @@ services:
       # - "8890:8890/udp" # SRT feeds
     environment:
       FRIGATE_RTSP_PASSWORD: "password"
-    depends_on:
-      - tailscale-frigate
-    network_mode: service:tailscale-frigate
+    networks:
+      - homelab-net
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.container_port: "5000" # Expose the internal unauthenticated port for TSDProxy to handle authentication and encryption
 
-volumes:
-  ts-frigate:
-    driver: local
+networks:
+  homelab-net:
+    external: true
