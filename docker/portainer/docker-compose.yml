@@ -1,34 +1,21 @@
 services:
-  tailscale-portainer:
-    image: tailscale/tailscale:latest
-    container_name: ts-portainer
-    hostname: portainer
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
-      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_SERVE_CONFIG=/config/portainer.json
-      - TS_STATE_DIR=/var/lib/tailscale
-    volumes:
-      - ts-portainer:/var/lib/tailscale
-      - ${CONFIG_ROOT}/tailscale/config:/config
-    restart: unless-stopped
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-    depends_on:
-      - tailscale-portainer
-    network_mode: service:tailscale-portainer
+    networks:
+      - homelab-net
     restart: unless-stopped
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.container_port: "9000"
 
 volumes:
-  ts-portainer:
-    driver: local
   portainer_data:
     driver: local
 
-# networks:
-#   homelab-net:
-#     external: true
+networks:
+  homelab-net:
+    external: true
