@@ -1,20 +1,5 @@
 services:
-  tailscale-navidrome:
-    image: tailscale/tailscale:latest
-    container_name: ts-navidrome
-    hostname: navidrome
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
-      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_SERVE_CONFIG=/config/navidrome.json
-      - TS_STATE_DIR=/var/lib/tailscale
-    volumes:
-      - ts-navidrome:/var/lib/tailscale
-      - ${CONFIG_ROOT}/tailscale/config:/config
-    networks:
-      - homelab-net
-    restart: unless-stopped
-  navidrome-service:
+  navidrome:
     image: deluan/navidrome:latest
     container_name: navidrome
     user: "501:20"  # Replace with your PUID and PGID if different
@@ -29,21 +14,16 @@ services:
     volumes:
       - ${DATA_ROOT}/navidrome:/data
       - ${MUSIC_ROOT}:/music
-    depends_on:
-      - tailscale-navidrome
-    # network_mode: service:tailscale-navidrome
     networks:
       - homelab-net
     restart: unless-stopped
+    labels:
+      tsdproxy.enable: "true"
     # expose:
     #   - "4533"  # Internal port for reverse proxy
     # ports:
     #   - "4533:4533"  # Optional, if you want to access it directly via localhost
 
-volumes:
-  ts-navidrome:
-    driver: local
-    
 networks:
   homelab-net:
     external: true
