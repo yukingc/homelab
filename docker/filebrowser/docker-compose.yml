@@ -5,6 +5,7 @@ services:
     volumes:
       - ${CONFIG_ROOT}/filebrowser:/config
       - /Users/piusyu/Public/Statements:/srv/Statements
+      - /Users/piusyu/Public/Documents certificates:/srv/Documents-Certificates
       - filebrowser_database:/database
     networks:
       - homelab-net
