@@ -1,19 +1,7 @@
 services:
-  tailscale-stirling-pdf:
-    image: tailscale/tailscale:latest
-    container_name: ts-stirling-pdf
-    hostname: stirling
-    environment:
-      - TS_AUTHKEY=${TS_AUTHKEY}
-      # - TS_EXTRA_ARGS=--advertise-tags=tag:container
-      - TS_SERVE_CONFIG=/config/stirling-pdf.json
-      - TS_STATE_DIR=/var/lib/tailscale
-    volumes:
-      - ts-stirling-pdf:/var/lib/tailscale
-      - ${CONFIG_ROOT}/tailscale/config:/config
-    restart: unless-stopped
   stirling-pdf:
     image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    container_name: stirling-pdf
     # expose:
     #   - "8080"
     # ports:
@@ -27,15 +15,12 @@ services:
     environment:
       - DISABLE_ADDITIONAL_FEATURES=false
       - LANGS=en_GB
-    network_mode: service:tailscale-stirling-pdf
     restart: unless-stopped
-    # networks:
-    #   - homelab-net
+    networks:
+      - homelab-net
+    labels:
+      tsdproxy.enable: "true"
 
-volumes:
-  ts-stirling-pdf:
-    driver: local
-
-# networks:
-#   homelab-net:
-#     external: true
+networks:
+  homelab-net:
+    external: true
