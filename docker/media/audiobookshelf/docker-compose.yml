@@ -1,0 +1,21 @@
+services:
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    # ports:
+    #   - 13378:80
+    volumes:
+      - ${DATA_ROOT}/audiobookshelf/audiobooks:/audiobooks
+      - ${DATA_ROOT}/audiobookshelf/podcasts:/podcasts
+      - ${CONFIG_ROOT}/audiobookshelf:/config
+      - ${DATA_ROOT}/audiobookshelf/metadata:/metadata
+    environment:
+      - TZ=America/Toronto
+    networks:
+      - homelab-net
+    labels:
+      tsdproxy.enable: "true"
+
+networks:
+  homelab-net:
+    external: true

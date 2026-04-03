@@ -17,6 +17,7 @@ SERVICE_DIRS := \
 	docker/media/jellyfin \
 	docker/media/navidrome \
 	docker/media/calibre-web-automated \
+	docker/media/audiobookshelf \
 	docker/monitoring/prometheus \
 	docker/monitoring/grafana \
 	docker/nextcloud \
