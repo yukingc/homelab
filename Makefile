@@ -18,6 +18,7 @@ SERVICE_DIRS := \
 	docker/media/navidrome \
 	docker/media/calibre-web-automated \
 	docker/media/audiobookshelf \
+	docker/media/epub-to-audiobook \
 	docker/monitoring/prometheus \
 	docker/monitoring/grafana \
 	docker/nextcloud \
