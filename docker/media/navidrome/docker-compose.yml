@@ -10,7 +10,7 @@ services:
       - ND_MUSICFOLDER=/music
       # - ND_BASEURL=/navidrome
       - ND_PROMETHEUS_ENABLED=true
-#      - ND_PROMETHEUS_METRICSPATH=/metrics
+      - ND_PROMETHEUS_METRICSPATH=/metrics
     volumes:
       - ${DATA_ROOT}/navidrome:/data
       - ${MUSIC_ROOT}:/music
