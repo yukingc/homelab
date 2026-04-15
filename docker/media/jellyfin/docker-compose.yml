@@ -12,10 +12,12 @@ services:
     networks:
       - homelab-net
     restart: unless-stopped
-    expose:
-      - "8096"  # Jellyfin's default HTTP port
-    ports:
-      - "8096:8096"  # for localhost access
+    # expose:
+    #   - "8096"  # Jellyfin's default HTTP port
+    # ports:
+    #   - "8096:8096"  # for localhost access
+    labels:
+      tsdproxy.enable: "true"
 
 networks:
   homelab-net:
