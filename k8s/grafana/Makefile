@@ -7,10 +7,10 @@ minikube-check:
 
 up: minikube-check
 	kubectl create namespace $(NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
-	kubectl apply -f grafana/
+	kubectl apply -f .
 
 down: minikube-check
-	kubectl delete -f grafana/
+	kubectl delete -f .
 
 restart: minikube-check
 	kubectl rollout restart deployment/grafana -n $(NAMESPACE)
