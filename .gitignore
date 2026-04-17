@@ -1,7 +1,28 @@
-config/audiobookshelf/*
-logs/
-audiobook_output/
-config/**/tsdproxy.yaml
+# secrets
 *.env
 *.key
 *.pem
+*.secret
+*.secrets
+credentials*
+
+# databases / state
+*.sqlite
+*.db
+
+# logs
+logs/
+**/logs/
+
+# runtime outputs
+audiobook_output/
+**/output/
+**/outputs/
+**/tmp/
+
+# service-specific sensitive configs
+config/**/tsdproxy.yaml
+config/**/tsdproxy.yml
+
+# audiobookshelf state
+config/audiobookshelf/*
