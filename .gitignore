@@ -1,2 +1,6 @@
 config/audiobookshelf/*
 logs
+config/**/tsdproxy.yaml
+*.env
+*.key
+*.pem
