@@ -28,6 +28,7 @@ SERVICE_DIRS := \
 	docker/filebrowser \
 	docker/portainer \
 	docker/tsdproxy \
+	docker/ollama-openwebui \
 # 	docker/caddy
 
 # Helper function to get a friendly service name from path
