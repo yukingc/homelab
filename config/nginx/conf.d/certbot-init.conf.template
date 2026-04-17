@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name cairparavel.ddns.net caircloud.ddns.net;
+    server_name ${DOMAINS};
 
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;

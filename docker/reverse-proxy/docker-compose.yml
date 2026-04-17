@@ -14,7 +14,7 @@ services:
       - ${CONFIG_ROOT}/modsecurity/rules:/etc/modsecurity.d/rules:ro
       # Replace the default ModSec nginx config; this is the nginx that comes with the ModSecurity image
       # - ${CONFIG_ROOT}/modsecurity/docker-nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - ${CONFIG_ROOT}/modsecurity/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template:ro
+      - ${CONFIG_ROOT}/modsecurity/default.conf.template:/etc/nginx/templates/default.conf.template:ro
       # Logs
       - ${DATA_ROOT}/modsecurity/logs:/var/log/modsecurity
     environment:
@@ -55,8 +55,10 @@ services:
   nginx-init:
     image: nginx:latest
     container_name: nginx-init
+    environment:
+      - DOMAINS=${DOMAINS}  # for envsubst in template
     volumes:
-      - ${CONFIG_ROOT}/nginx/conf.d/certbot-init.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${CONFIG_ROOT}/nginx/conf.d/certbot-init.conf.template:/etc/nginx/templates/conf.d/certbot-init.conf.template:ro
       - ${DATA_ROOT}/certbot/www:/var/www/certbot
     networks:
       - homelab-net
@@ -69,19 +71,18 @@ services:
     image: certbot/certbot
     container_name: certbot-init
     environment:
-      - DOMAINS=${DOMAINS}
+      - DOMAINS_D=${DOMAINS_D}
       - EMAIL=${EMAIL}
-    # entrypoint: "/bin/sh -c 'certbot certonly --standalone $DOMAINS --agree-tos -m $EMAIL --no-eff-email && touch /etc/letsencrypt/.certbot-done'"
-    entrypoint: "/bin/sh -c 'certbot certonly --webroot -w /var/www/certbot $DOMAINS --agree-tos -m $EMAIL --no-eff-email && touch /etc/letsencrypt/.certbot-done'"
+    # entrypoint: "/bin/sh -c 'certbot certonly --standalone $DOMAINS_D --agree-tos -m $EMAIL --no-eff-email && touch /etc/letsencrypt/.certbot-done'"
+    entrypoint: "/bin/sh -c 'certbot certonly --webroot -w /var/www/certbot $DOMAINS_D --agree-tos -m $EMAIL --no-eff-email && touch /etc/letsencrypt/.certbot-done'"
     volumes:
       - ${DATA_ROOT}/certbot/conf:/etc/letsencrypt
       - ${DATA_ROOT}/certbot/www:/var/www/certbot
       - ${DATA_ROOT}/certbot/logs:/var/log/letsencrypt
     networks:
       - homelab-net
-    ports:
-      - "80:80"
-      - "443:443"
+    depends_on:
+      - nginx-init  # wait for nginx to be up before running challenge
     restart: "no"
     profiles:
       - init
@@ -89,7 +90,3 @@ services:
 networks:
   homelab-net:
     external: true
-  # navidrome_default:
-  #   external: true
-  # calibre-web-automated_default:
-  #   external: true
