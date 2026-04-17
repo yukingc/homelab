@@ -132,3 +132,55 @@ This platform is intentionally designed to explore:
 - Practical self-hosted system design patterns
 
 It serves as both a functional system and an evolving infrastructure experimentation environment.
+
+---
+
+## 🚀 Usage
+
+All services are managed via `make` from the repo root.
+
+### Start / Stop platform
+```bash
+make up        # start all services
+make down      # stop all services
+make restart   # restart all services
+```
+
+### Logs
+
+```bash
+make logs      # tail logs for all services
+```
+
+### Network setup
+
+```bash
+make network-setup
+```
+
+(Automatically runs as part of make up)
+
+### Per-service commands
+
+Generated for each service (e.g. jellyfin, navidrome, etc.):
+
+```bash
+make <service>-up
+make <service>-down
+make <service>-logs
+make <service>-pull
+make <service>-up-force
+make <service>-down-vol
+```
+
+Example:
+```bash
+make jellyfin-up
+make jellyfin-logs
+```
+
+### Reverse proxy (legacy)
+```bash
+make reverse-proxy-up
+```
+Note: only used for TLS bootstrap; core services use Tailscale for access.
