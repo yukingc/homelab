@@ -1,13 +1,12 @@
 services:
 
   init-config:
-    image: busybox
+    build:
+      context: .
+      dockerfile: Dockerfile.init
     volumes:
       - filebrowser_config:/config
-      - ./config/settings.json:/source/settings.json:ro
-    command: cp -n /source/settings.json /config/settings.json
-    # The init-config service will run once to copy the default settings.json to the calibre_config volume if it doesn't already exist.
-    # -n (no-clobber) ensures you don't overwrite existing user data on restarts
+    restart: "no"
 
   filebrowser:
     image: filebrowser/filebrowser:latest

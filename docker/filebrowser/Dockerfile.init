@@ -1,0 +1,7 @@
+FROM busybox:latest
+
+# Copy the config file into the image
+COPY config/settings.json /settings.json
+
+# Command to copy config if it doesn't exist
+CMD ["sh", "-c", "if [ ! -f /config/settings.json ]; then cp /settings.json /config/settings.json; fi"]
