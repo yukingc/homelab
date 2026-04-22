@@ -5,16 +5,22 @@ services:
     # ports:
     #   - 13378:80
     volumes:
-      - ${DATA_ROOT}/audiobookshelf/audiobooks:/audiobooks
-      - ${DATA_ROOT}/audiobookshelf/podcasts:/podcasts
-      - ${CONFIG_ROOT}/audiobookshelf:/config
-      - ${DATA_ROOT}/audiobookshelf/metadata:/metadata
+      - ${MEDIA_ROOT}/audiobookshelf/audiobooks:/audiobooks
+      - ${MEDIA_ROOT}/audiobookshelf/podcasts:/podcasts
+      - audiobookshelf-config:/config
+      - audiobookshelf-metadata:/metadata
     environment:
       - TZ=America/Toronto
     networks:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+
+volumes:
+  audiobookshelf-config:
+    driver: local
+  audiobookshelf-metadata:
+    driver: local
 
 networks:
   homelab-net:
