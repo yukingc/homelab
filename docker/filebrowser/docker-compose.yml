@@ -24,6 +24,12 @@ services:
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "File Management"
+      homepage.name: "File Browser"
+      homepage.icon: "fa-solid fa-file"
+      homepage.href: "https://filebrowser.mulley-bonito.ts.net"
+      homepage.description: "A web-based file manager that allows you to manage your files and folders through a user-friendly interface. It provides features such as file uploading, downloading, editing, and sharing, making it easy to organize and access your files from anywhere." # Optional description for the homepage
+
 
 volumes:
   filebrowser_config:
