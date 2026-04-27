@@ -19,6 +19,12 @@ services:
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "Media"
+      homepage.name: "Navidrome"
+      homepage.icon: "navidrome"
+      homepage.href: "https://navidrome.mulley-bonito.ts.net"
+      homepage.description: "A fast and powerful music server with a modern web interface."
+
     # expose:
     #   - "4533"  # Internal port for reverse proxy
     # ports:

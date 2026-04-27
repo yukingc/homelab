@@ -20,6 +20,12 @@ services:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "Utilities"
+      homepage.name: "Stirling PDF"
+      homepage.icon: "stirling-pdf"
+      homepage.href: "https://stirling-pdf.mulley-bonito.ts.net"
+      homepage.description: "A web-based PDF editor that allows you to manage your PDF files through a user-friendly interface. It provides features such as PDF editing, converting, and sharing, making it easy to organize and access your PDF files from anywhere."
+
 
 networks:
   homelab-net:

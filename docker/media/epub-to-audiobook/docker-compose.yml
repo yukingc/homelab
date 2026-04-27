@@ -29,6 +29,11 @@ services:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "Media"
+      homepage.name: "Epub to Audiobook"
+      homepage.icon: "epub-to-audiobook"
+      homepage.href: "https://epub-to-audiobook.mulley-bonito.ts.net"
+      homepage.description: "A tool for converting EPUB files to audiobooks using Azure Text-to-Speech API."
 
 volumes:
   epub-to-audiobook-app:

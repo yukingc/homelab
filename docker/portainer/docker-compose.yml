@@ -11,6 +11,11 @@ services:
     labels:
       tsdproxy.enable: "true"
       tsdproxy.container_port: "9000"
+      homepage.group: "Monitoring & Management"
+      homepage.name: "Portainer"
+      homepage.icon: "portainer"
+      homepage.href: "https://portainer.mulley-bonito.ts.net"
+      homepage.description: "Portainer is a lightweight management tool for Docker environments. It provides a simple interface for managing containers, images, networks, and volumes."
 
 volumes:
   portainer_data:

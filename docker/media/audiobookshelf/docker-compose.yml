@@ -15,6 +15,11 @@ services:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "Media"
+      homepage.name: "Audiobookshelf"
+      homepage.icon: "audiobookshelf"
+      homepage.href: "https://audiobookshelf.mulley-bonito.ts.net"
+      homepage.description: "Audiobookshelf is a self-hosted audiobook and podcast server that allows you to organize, stream, and manage your audiobook and podcast collection. It provides a user-friendly interface for browsing and playing your media, as well as features like metadata management, cover art support, and multi-user access."
 
 volumes:
   audiobookshelf-config:

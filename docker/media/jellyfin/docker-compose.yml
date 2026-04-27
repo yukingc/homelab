@@ -18,6 +18,12 @@ services:
     #   - "8096:8096"  # for localhost access
     labels:
       tsdproxy.enable: "true"
+      homepage.group: "Media"
+      homepage.name: "Jellyfin"
+      homepage.icon: "jellyfin"
+      homepage.href: "https://jellyfin.mulley-bonito.ts.net"
+      homepage.description: "Jellyfin is a free and open-source media server that allows you to manage and stream your media files."
+
 
 networks:
   homelab-net:
