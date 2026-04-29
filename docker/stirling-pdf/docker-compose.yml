@@ -2,10 +2,10 @@ services:
   stirling-pdf:
     image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
     container_name: stirling-pdf
-    # expose:
-    #   - "8080"
-    # ports:
-    #   - "8081:8080"
+    expose:
+      - "8080"
+    ports:
+      - "8081:8080"
     volumes:
       - ${DATA_ROOT}/StirlingPDF/trainingData:/usr/share/tessdata # Required for extra OCR languages
       - ${DATA_ROOT}/StirlingPDF/extraConfigs:/configs
@@ -20,6 +20,7 @@ services:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+      tsdproxy.container_port: "8080"
       homepage.group: "Utilities"
       homepage.name: "Stirling PDF"
       homepage.icon: "stirling-pdf"
