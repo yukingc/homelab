@@ -1,8 +1,24 @@
-# Self-Hosted Platform Infrastructure
+# homelab  🏠
 
-This repository defines a personal self-hosted infrastructure platform designed around a **private mesh networking model**, observability-first operations, and modular service deployment.
+My personal homelab — a self-hosted infrastructure playground running on my home Mac Mini, Beelink mini-PC and Raspberry Pi.
+
+Designed around a **private mesh networking model**, observability-first operations, and modular service deployment.
 
 Rather than relying on traditional public ingress (e.g. reverse proxies), this platform uses **Tailscale as the primary network access layer**, enabling secure, identity-based access to all services.
+
+---
+
+## 🧠 Design Philosophy
+
+This platform is intentionally designed to explore:
+
+- Private-by-default infrastructure
+- Minimal public attack surface
+- Composable service architecture
+- Observability as a first-class concern
+- Practical self-hosted system design patterns
+
+It serves as both a functional system and an evolving infrastructure experimentation environment.
 
 ---
 
@@ -118,20 +134,6 @@ Future direction:
 - OpenTelemetry instrumentation
 - Distributed tracing across services
 - Centralized log aggregation
-
----
-
-## 🧠 Design Philosophy
-
-This platform is intentionally designed to explore:
-
-- Private-by-default infrastructure
-- Minimal public attack surface
-- Composable service architecture
-- Observability as a first-class concern
-- Practical self-hosted system design patterns
-
-It serves as both a functional system and an evolving infrastructure experimentation environment.
 
 ---
 
