@@ -25,7 +25,7 @@ services:
       homepage.group: "Media"
       homepage.name: "Calibre Web Automated"
       homepage.icon: "calibre-web-automated-book-downloader"
-      homepage.href: "https://calibre-web-automated.mulley-bonito.ts.net"
+      homepage.href: "https://calibre.mulley-bonito.ts.net"
       homepage.description: "Calibre Web Automated is a self-hosted web application for managing and reading your eBook collection. It provides an intuitive interface for organizing, browsing, and reading your eBooks, as well as features like metadata management, cover art support, and multi-user access. With Calibre Web Automated, you can easily access your eBooks from any device with a web browser."
 
 
