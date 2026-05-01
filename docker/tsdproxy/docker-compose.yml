@@ -7,7 +7,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - datadir:/data
-      - ${CONFIG_ROOT}/tsdproxy:/config
+      - ${SECRETS_ROOT}/tsdproxy-config:/config
     restart: unless-stopped
     ports:
       - "8090:8090"
