@@ -3,6 +3,8 @@ services:
     image: deluan/navidrome:latest
     container_name: navidrome
     # user: "501:20"  # Replace with your PUID and PGID if different
+    env_file:
+      - .env.common
     environment:
       - ND_SCANINTERVAL=1m
       - ND_LOGLEVEL=info

@@ -2,6 +2,8 @@ services:
   modsecurity:
     image: owasp/modsecurity:nginx
     container_name: modsecurity
+    env_file:
+      - .env.common
     ports:
       - "443:443"
       - "80:80"

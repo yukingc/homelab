@@ -11,6 +11,8 @@ services:
     #   - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://github.com/jnicolson/gasket-builder
     #   - /dev/video11:/dev/video11 # For Raspberry Pi 4B
     #   - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    env_file:
+      - .env.common
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ${DATA_ROOT}/frigate/config:/config

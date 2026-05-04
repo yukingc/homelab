@@ -2,6 +2,8 @@ services:
   jellyfin:
     image: jellyfin/jellyfin:latest
     container_name: jellyfin
+    env_file:
+      - .env.common
     environment:
       - PUID=501
       - PGID=20
