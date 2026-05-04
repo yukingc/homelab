@@ -19,6 +19,7 @@ SERVICE_DIRS := \
 	docker/media/calibre-web-automated \
 	docker/media/audiobookshelf \
 	docker/media/epub-to-audiobook \
+	docker/media/immich \
 	docker/monitoring/prometheus \
 	docker/monitoring/grafana \
 	docker/nextcloud \

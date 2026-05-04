@@ -30,6 +30,16 @@ services:
     restart: always
     healthcheck:
       disable: false
+    networks:
+      - homelab-net
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: "immich"
+      homepage.group: "Media"
+      homepage.name: "Immich"
+      homepage.icon: "immich"
+      homepage.href: "https://immich.mulley-bonito.ts.net"
+      homepage.description: "Immich is a self-hosted photo and video management application. It provides an intuitive interface for organizing, browsing, and reading your media files, as well as features like metadata management, cover art support, and multi-user access. With Immich, you can easily access your media from any device with a web browser."
 
   immich-machine-learning:
     container_name: immich_machine_learning
@@ -46,6 +56,8 @@ services:
     restart: always
     healthcheck:
       disable: false
+    networks:
+      - homelab-net
 
   redis:
     container_name: immich_redis
@@ -53,6 +65,8 @@ services:
     healthcheck:
       test: redis-cli ping || exit 1
     restart: always
+    networks:
+      - homelab-net
 
   database:
     container_name: immich_postgres
@@ -71,6 +85,12 @@ services:
     restart: always
     healthcheck:
       disable: false
+    networks:
+      - homelab-net
 
 volumes:
   model-cache:
+
+networks:
+  homelab-net:
+    external: true
