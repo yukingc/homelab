@@ -2,8 +2,6 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
-    env_file:
-      - .env.common
     command:
       - '--config.file=/etc/prometheus/prometheus.yaml'
     # ports:

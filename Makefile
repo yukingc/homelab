@@ -50,32 +50,32 @@ all: up
 up: network-setup
 	@for dir in $(SERVICE_DIRS); do \
 		echo "Bringing up $$dir..."; \
-		(cd $$dir && docker compose up -d); \
+		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env up -d); \
 	done
 
 down:
 	@for dir in $(SERVICE_DIRS); do \
 		echo "Bringing down $$dir..."; \
-		(cd $$dir && docker compose down); \
+		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env down); \
 	done
 
 logs:
 	@for dir in $(SERVICE_DIRS); do \
 		echo "Logs for $$dir:"; \
-		(cd $$dir && docker compose logs --tail 50 -f); \
+		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f); \
 	done
 
 restart: down up
 
 # Generate per-service targets like jellyfin-up, navidrome-up
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up: ; @cd $(dir) && docker compose up -d))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up-force: ; @cd $(dir) && docker compose up -d --force-recreate))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down: ; @cd $(dir) && docker compose down))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down-vol: ; @cd $(dir) && docker compose down -v))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-logs: ; @cd $(dir) && docker compose logs --tail 50 -f))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-pull: ; @cd $(dir) && docker compose pull))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up-force: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d --force-recreate))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down-vol: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down -v))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-logs: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-pull: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env pull))
 
-include .env.common # for DATA_ROOT used below
+include .env # for DATA_ROOT used below
 
 # Reverse-proxy target with automatic certbot-init
 reverse-proxy-up: network-setup
@@ -84,11 +84,11 @@ reverse-proxy-up: network-setup
 	@echo "Checking if Certbot has run..."
 	@if [ ! -f "$(DATA_ROOT)/certbot/conf/.certbot-done" ]; then \
 		echo "Initial certificate not found. Running certbot-init..."; \
-		docker compose -f docker/reverse-proxy/docker-compose.yml --profile init up -d nginx-init; \
-		docker compose -f docker/reverse-proxy/docker-compose.yml --profile init run --rm certbot-init; \
-		docker compose -f docker/reverse-proxy/docker-compose.yml --profile init down; \
+		docker compose --env-file $(ROOT_DIR)/.env -f docker/reverse-proxy/docker-compose.yml --profile init up -d nginx-init; \
+		docker compose --env-file $(ROOT_DIR)/.env -f docker/reverse-proxy/docker-compose.yml --profile init run --rm certbot-init; \
+		docker compose --env-file $(ROOT_DIR)/.env -f docker/reverse-proxy/docker-compose.yml --profile init down; \
 	else \
 		echo "Certificate already exists. Skipping certbot-init."; \
 	fi
 	@echo "Starting Nginx and Certbot services..."
-	@docker compose -f docker/reverse-proxy/docker-compose.yml up -d nginx certbot modsecurity
+	@docker compose --env-file $(ROOT_DIR)/.env -f docker/reverse-proxy/docker-compose.yml up -d nginx certbot modsecurity

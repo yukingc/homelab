@@ -7,8 +7,6 @@ services:
       - PGID=20
       # Edit to match your current timezone https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
       # - TZ=UTC 
-    env_file:
-      - .env.common
     volumes:
       # CW users migrating should stop their existing CW instance, make a copy of the config folder, and bind that here to carry over all of their user settings ect.
       - calibre-web-automated-config:/config 

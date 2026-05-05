@@ -5,8 +5,6 @@ services:
     # ports:
     #   - 3000:3000
     restart: unless-stopped
-    env_file:
-      - .env.common
     environment:
 #      - GF_SERVER_ROOT_URL=https://cairparavel.ddns.net/grafana
       - GF_SERVER_SERVE_FROM_SUB_PATH=true # if your external grafana endpoint has a subpath or not

@@ -4,8 +4,6 @@ services:
     container_name: audiobookshelf
     # ports:
     #   - 13378:80
-    env_file:
-      - .env.common
     volumes:
       - ${MEDIA_ROOT}/audiobookshelf/audiobooks:/audiobooks
       - ${MEDIA_ROOT}/audiobookshelf/podcasts:/podcasts

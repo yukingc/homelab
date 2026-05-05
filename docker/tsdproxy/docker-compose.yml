@@ -2,8 +2,6 @@ services:
   tsdproxy:
     image: almeidapaulopt/tsdproxy:1
     container_name: tsdproxy
-    env_file:
-      - .env.common
     # environment:
       # - TS_AUTHKEY=${TS_AUTHKEY}
     volumes:
