@@ -33,9 +33,9 @@ SERVICE_DIRS := \
 	docker/homepage \
 # 	docker/caddy
 
-# Helper function to get a friendly service name from path
+# Extracts the last path component as the service name, e.g. "docker/media/immich" -> "immich"
 define service_name
-$(notdir $(shell echo $(1) | sed 's|.*/||'))
+$(notdir $(1))
 endef
 
 .PHONY: all up down logs restart network-setup $(foreach dir,$(SERVICE_DIRS),$(call service_name,$(dir))-up $(call service_name,$(dir))-down)
@@ -47,33 +47,51 @@ network-setup:
 # Bring up all services
 all: up
 
-up: network-setup
+# Runs a docker compose command across all SERVICE_DIRS in sequence.
+# Env file resolution: uses a local .env in the service dir if present,
+# otherwise falls back to the root .env.
+define dc_all
 	@for dir in $(SERVICE_DIRS); do \
-		echo "Bringing up $$dir..."; \
-		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env up -d); \
+		echo "$(1) $$dir..."; \
+		(cd $$dir && docker compose --env-file $$([ -f $$dir/.env ] && echo $$dir/.env || echo $(ROOT_DIR)/.env) $(2)); \
 	done
+endef
+
+up: network-setup
+	$(call dc_all,Bringing up,up -d)
 
 down:
-	@for dir in $(SERVICE_DIRS); do \
-		echo "Bringing down $$dir..."; \
-		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env down); \
-	done
+	$(call dc_all,Bringing down,down)
 
 logs:
-	@for dir in $(SERVICE_DIRS); do \
-		echo "Logs for $$dir:"; \
-		(cd $$dir && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f); \
-	done
+	$(call dc_all,Logs for,logs --tail 50 -f)
 
 restart: down up
 
-# Generate per-service targets like jellyfin-up, navidrome-up
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-up-force: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env up -d --force-recreate))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-down-vol: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env down -v))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-logs: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env logs --tail 50 -f))
-$(foreach dir,$(SERVICE_DIRS),$(eval $(call service_name,$(dir))-pull: ; @cd $(dir) && docker compose --env-file $(ROOT_DIR)/.env pull))
+# Generic docker compose command dispatcher
+#
+# Generates targets for each service dir, e.g. for a dir named "navidrome":
+#   make navidrome-up          # start containers in background
+#   make navidrome-up-force    # recreate containers from scratch
+#   make navidrome-down        # stop and remove containers
+#   make navidrome-down-vol    # stop and remove containers + volumes
+#   make navidrome-logs        # tail last 50 log lines and follow
+#   make navidrome-pull        # pull latest images
+#
+# Env file resolution: prefer a local .env in the service dir if it exists,
+# otherwise fall back to the root .env.
+#   $(wildcard ...)            -> expands to the path if the file exists, "" if not
+#   $(if <cond>,<then>,<else>) -> picks local or root path based on the above
+define dc_cmd
+$(call service_name,$(1))-$(2): ; @cd $(1) && docker compose --env-file $(if $(wildcard $(ROOT_DIR)/$(1)/.env),$(ROOT_DIR)/$(1)/.env,$(ROOT_DIR)/.env) $(3)
+endef
+
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),up,        up -d)))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),up-force,  up -d --force-recreate)))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),down,      down)))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),down-vol,  down -v)))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),logs,      logs --tail 50 -f)))
+$(foreach dir,$(SERVICE_DIRS),$(eval $(call dc_cmd,$(dir),pull,      pull)))
 
 include .env # for DATA_ROOT used below
 
