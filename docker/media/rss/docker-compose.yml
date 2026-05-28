@@ -1,0 +1,123 @@
+services:
+
+  # ─────────────────────────────────────────────
+  # FreshRSS — RSS aggregator & reader
+  # Tailscale: https://freshrss.<tailnet>.ts.net
+  # ─────────────────────────────────────────────
+  freshrss:
+    image: freshrss/freshrss:latest
+    container_name: freshrss
+    restart: unless-stopped
+    environment:
+      # TZ: Asia/Hong_Kong
+      CRON_MIN: "1,31"               # Refresh feeds at :01 and :31 past every hour
+      FRESHRSS_ENV: production
+    volumes:
+      - freshrss_data:/var/www/FreshRSS/data
+      - freshrss_extensions:/var/www/FreshRSS/extensions
+    networks:
+      - homelab-net
+      - rss_internal
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: "freshrss"
+      tsdproxy.port.1: "443/https:80/http"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/i/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────
+  # RSSBridge — generates RSS for sites without feeds
+  # (SCMP, FT, Bloomberg, Nikkei, YouTube, Reddit…)
+  # Tailscale: https://rssbridge.<tailnet>.ts.net
+  # ─────────────────────────────────────────────
+  rssbridge:
+    image: rssbridge/rss-bridge:latest
+    container_name: rssbridge
+    restart: unless-stopped
+    volumes:
+      - ./rssbridge/whitelist.txt:/app/whitelist.txt:ro
+      - ./rssbridge/config.ini.php:/app/config.ini.php:ro
+    networks:
+      - homelab-net
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: "rssbridge"
+      tsdproxy.port.1: "443/https:80/http"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────
+  # RSSHub — community bridge (AP News, Asian sources, Reddit…)
+  # Tailscale: https://rsshub.<tailnet>.ts.net
+  # ─────────────────────────────────────────────
+  rsshub:
+    image: diygod/rsshub:latest
+    container_name: rsshub
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: redis://redis:6379/
+      # Uncomment to enable source-specific auth:
+      # YOUTUBE_KEY: ""              # YouTube Data API key
+      # TWITTER_USERNAME: ""
+      # TWITTER_PASSWORD: ""
+    networks:
+      - homelab-net
+      - rss_internal
+    depends_on:
+      redis:
+        condition: service_healthy
+    labels:
+      tsdproxy.enable: "true"
+      tsdproxy.name: "rsshub"
+      tsdproxy.port.1: "443/https:1200/http"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1200/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ─────────────────────────────────────────────
+  # Redis — RSSHub cache
+  # Internal only, not exposed to Tailscale
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: rsshub_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - rss_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+# ─────────────────────────────────────────────
+# Volumes
+# ─────────────────────────────────────────────
+volumes:
+  freshrss_data:
+  freshrss_extensions:
+  redis_data:
+
+# ─────────────────────────────────────────────
+# Networks
+# homelab-net  — external, shared with your existing TSDProxy
+# rss_internal — internal only, for DB/cache isolation
+# ─────────────────────────────────────────────
+networks:
+  homelab-net:
+    external: true
+  rss_internal:
+    driver: bridge
+    internal: true

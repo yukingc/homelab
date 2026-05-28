@@ -1,0 +1,23 @@
+# RSSBridge whitelist — one bridge class name per line.
+# Only listed bridges are accessible. Comment out any you don't need.
+# Full list of available bridges: https://rss-bridge.org/bridge_list
+
+# ── Paywalled / no-native-RSS news ──────────────────
+SouthChinaMorningPostBridge
+FinancialTimesBridge
+BloombergBridge
+NikkeiBridge
+
+# ── Video ────────────────────────────────────────────
+YoutubeBridge
+
+# ── Social ───────────────────────────────────────────
+RedditBridge
+TwitterBridge
+
+# ── General-purpose scrapers (handy catch-alls) ──────
+CssSelectorBridge
+XPathBridge
+HTMLFilterBridge
+FeedMergeBridge
+FilterBridge
