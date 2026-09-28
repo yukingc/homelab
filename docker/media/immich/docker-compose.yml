@@ -16,10 +16,13 @@ services:
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
+    environment:
+      IMMICH_MACHINE_LEARNING_URL: http://100.83.189.91:3003
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
       - ${UPLOAD_LOCATION}:/data
       - /etc/localtime:/etc/localtime:ro
+      - ${EXTERNAL_LIBRARY_LOCATION}:/mnt/osxphotos-export:ro
     ports:
       - '2283:2283'
     depends_on:
@@ -39,21 +42,21 @@ services:
       homepage.href: "https://immich.mulley-bonito.ts.net"
       homepage.description: "Immich is a self-hosted photo and video management application. It provides an intuitive interface for organizing, browsing, and reading your media files, as well as features like metadata management, cover art support, and multi-user access. With Immich, you can easily access your media from any device with a web browser."
 
-  immich-machine-learning:
-    container_name: immich_machine_learning
-    # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
-    # Example tag: ${IMMICH_VERSION:-release}-cuda
-    image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
-    # extends: # uncomment this section for hardware acceleration - see https://docs.immich.app/features/ml-hardware-acceleration
-    #   file: hwaccel.ml.yml
-    #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
-    volumes:
-      - model-cache:/cache
-    restart: always
-    healthcheck:
-      disable: false
-    networks:
-      - homelab-net
+  # immich-machine-learning:
+  #   container_name: immich_machine_learning
+  #   # For hardware acceleration, add one of -[armnn, cuda, rocm, openvino, rknn] to the image tag.
+  #   # Example tag: ${IMMICH_VERSION:-release}-cuda
+  #   image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+  #   # extends: # uncomment this section for hardware acceleration - see https://docs.immich.app/features/ml-hardware-acceleration
+  #   #   file: hwaccel.ml.yml
+  #   #   service: cpu # set to one of [armnn, cuda, rocm, openvino, openvino-wsl, rknn] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+  #   volumes:
+  #     - model-cache:/cache
+  #   restart: always
+  #   healthcheck:
+  #     disable: false
+  #   networks:
+  #     - homelab-net
 
   redis:
     container_name: immich_redis
