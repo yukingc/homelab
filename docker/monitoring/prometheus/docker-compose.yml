@@ -2,18 +2,17 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yaml'
-    # ports:
-    #   - 9090:9090
     restart: unless-stopped
     volumes:
-      - ${CONFIG_ROOT}/prometheus/etc:/etc/prometheus
-      - ${DATA_ROOT}/prometheus/data:/prometheus
+      - ./config:/etc/prometheus:ro
+      - prometheus-data:/prometheus
     networks:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+
+volumes:
+  prometheus-data:
 
 networks:
   homelab-net:

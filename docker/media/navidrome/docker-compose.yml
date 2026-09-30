@@ -13,8 +13,7 @@ services:
       - ND_PROMETHEUS_METRICSPATH=/metrics
       - ND_PID_ALBUM="musicbrainz_albumid|album,albumversion"
     volumes:
-      # - ${DATA_ROOT}/navidrome:/data
-      - navidrome_data:/data
+      - navidrome-data:/data
       - ${MUSIC_ROOT}:/music
     networks:
       - homelab-net
@@ -37,4 +36,4 @@ networks:
     external: true
 
 volumes:
-  navidrome_data:
+  navidrome-data:

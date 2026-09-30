@@ -12,14 +12,13 @@ services:
     #   - /dev/video11:/dev/video11 # For Raspberry Pi 4B
     #   - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
     volumes:
-      - /etc/localtime:/etc/localtime:ro
-      - ${DATA_ROOT}/frigate/config:/config
-      - ${DATA_ROOT}/frigate/media:/media/frigate
+      - frigate-config:/config
+      - ./config.yml:/config/config.yml
+      - ${FRIGATE_MEDIA_ROOT}:/media/frigate
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:
           size: 1000000000
-      - ${DATA_ROOT}/frigate/go2rtc/certs:/certs:ro # Optional:for secure RTSP/WebRTC connections
     # ports:
       # - "8971:8971"
       # - "5000:5000" # Internal unauthenticated access. Expose carefully.
@@ -36,6 +35,9 @@ services:
     labels:
       tsdproxy.enable: "true"
       tsdproxy.container_port: "5000" # Expose the internal unauthenticated port for TSDProxy to handle authentication and encryption
+
+volumes:
+  frigate-config:
 
 networks:
   homelab-net:

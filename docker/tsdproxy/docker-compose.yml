@@ -19,4 +19,4 @@ volumes:
 
 networks:
   homelab-net:
-    external: true
+    name: homelab-net

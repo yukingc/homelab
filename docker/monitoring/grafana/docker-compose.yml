@@ -2,18 +2,17 @@ services:
   grafana:
     image: grafana/grafana
     container_name: grafana
-    # ports:
-    #   - 3000:3000
     restart: unless-stopped
-    environment:
-#      - GF_SERVER_ROOT_URL=https://cairparavel.ddns.net/grafana
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true # if your external grafana endpoint has a subpath or not
     volumes:
-      - ${CONFIG_ROOT}/grafana/etc:/etc/grafana/provisioning/datasources
+      - ./provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - grafana-data:/var/lib/grafana
     networks:
       - homelab-net
     labels:
       tsdproxy.enable: "true"
+
+volumes:
+  grafana-data:
 
 networks:
   homelab-net:
