@@ -16,11 +16,11 @@ services:
     ports:
       - "8090:8090"
     networks:
-      - homelab-net
+      - tsdproxy-net
     
 volumes:
   datadir:
 
 networks:
-  homelab-net:
-    name: homelab-net
+  tsdproxy-net:
+    name: tsdproxy-net
