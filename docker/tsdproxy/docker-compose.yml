@@ -1,9 +1,34 @@
+configs:
+  tsdproxy_cfg:
+    content: |
+      defaultProxyProvider: default
+      docker:
+        local:
+          host: unix:///var/run/docker.sock
+      files: {}
+      tailscale:
+        providers:
+          default:
+            authKeyFile: /run/secrets/ts_authkey
+            controlUrl: https://controlplane.tailscale.com
+        datadir: /data/
+      http:
+        hostname: 0.0.0.0
+        port: 8090
+      log:
+        level: info
+        json: false
+      proxyAccessLog: true
+
 secrets:
   ts_authkey:
     environment: TSDPROXY_AUTHKEY
 
 services:
   tsdproxy:
+    configs:
+      - source: tsdproxy_cfg
+        target: /config/tsdproxy.yaml
     secrets:
       - ts_authkey
     image: almeidapaulopt/tsdproxy:1
@@ -11,7 +36,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - datadir:/data
-      - ./config:/config
     restart: unless-stopped
     ports:
       - "8090:8090"
