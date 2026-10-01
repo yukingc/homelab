@@ -1,13 +1,17 @@
+secrets:
+  ts_authkey:
+    environment: TSDPROXY_AUTHKEY
+
 services:
   tsdproxy:
+    secrets:
+      - ts_authkey
     image: almeidapaulopt/tsdproxy:1
     container_name: tsdproxy
-    # environment:
-      # - TS_AUTHKEY=${TS_AUTHKEY}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - datadir:/data
-      - ${SECRETS_ROOT}/tsdproxy-config:/config
+      - ./config:/config
     restart: unless-stopped
     ports:
       - "8090:8090"
