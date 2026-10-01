@@ -5,8 +5,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
-    networks:
-      - homelab-net
     restart: unless-stopped
     ports:
       - "127.0.0.1:9443:9443"
@@ -22,7 +20,3 @@ services:
 volumes:
   portainer_data:
     driver: local
-
-networks:
-  homelab-net:
-    external: true
