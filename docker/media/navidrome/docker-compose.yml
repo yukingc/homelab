@@ -14,7 +14,12 @@ services:
       - ND_PID_ALBUM="musicbrainz_albumid|album,albumversion"
     volumes:
       - navidrome-data:/data
-      - ${MUSIC_ROOT}:/music
+      - type: bind
+        source: ${MUSIC_ROOT:?set MUSIC_ROOT in the stack env}
+        target: /music
+        read_only: true
+        bind:
+          create_host_path: false
     networks:
       - tsdproxy-net
     restart: unless-stopped
