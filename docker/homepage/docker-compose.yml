@@ -11,7 +11,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
     networks:
-      - homelab-net
+      - tsdproxy-net
 
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
@@ -26,7 +26,7 @@ services:
       - PUID=501
       - PGID=20
     networks:
-      - homelab-net
+      - tsdproxy-net
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
@@ -35,5 +35,5 @@ volumes:
   homepage-config:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

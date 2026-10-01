@@ -14,7 +14,7 @@ services:
       - SYSTEM_DEFAULTLOCALE=en-GB      # Default interface language
     restart: unless-stopped
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       tsdproxy.container_port: "8080"
@@ -28,5 +28,5 @@ volumes:
   tessdata:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

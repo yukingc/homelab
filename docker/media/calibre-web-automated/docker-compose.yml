@@ -15,7 +15,7 @@ services:
       # If you don't have an existing library, CWA will automatically create one at the bind provided here
       - "${MEDIA_ROOT}/Calibre Web Automated/calibre-library:/calibre-library"
     networks:
-      - homelab-net
+      - tsdproxy-net
     # ports:
     #   - 8083:8083 
     restart: unless-stopped
@@ -33,5 +33,5 @@ volumes:
   calibre-web-automated-config:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

@@ -12,7 +12,7 @@ services:
     environment:
       - TZ=America/Toronto
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       homepage.group: "Media"
@@ -28,5 +28,5 @@ volumes:
     driver: local
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

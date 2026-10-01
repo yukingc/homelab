@@ -32,7 +32,7 @@ services:
     healthcheck:
       disable: false
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       tsdproxy.name: "immich"
@@ -56,7 +56,7 @@ services:
   #   healthcheck:
   #     disable: false
   #   networks:
-  #     - homelab-net
+  #     - tsdproxy-net
 
   redis:
     container_name: immich_redis
@@ -65,7 +65,7 @@ services:
       test: redis-cli ping || exit 1
     restart: always
     networks:
-      - homelab-net
+      - tsdproxy-net
 
   database:
     container_name: immich_postgres
@@ -85,11 +85,11 @@ services:
     healthcheck:
       disable: false
     networks:
-      - homelab-net
+      - tsdproxy-net
 
 volumes:
   model-cache:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

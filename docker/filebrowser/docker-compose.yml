@@ -20,7 +20,7 @@ services:
       - /Users/piusyu/Public/Documents certificates:/srv/Documents-Certificates
       - filebrowser_database:/database
     networks:
-      - homelab-net
+      - tsdproxy-net
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
@@ -35,5 +35,5 @@ volumes:
   filebrowser_database:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

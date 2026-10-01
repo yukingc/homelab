@@ -31,7 +31,7 @@ services:
     environment:
       FRIGATE_RTSP_PASSWORD: "password"
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       tsdproxy.container_port: "5000" # Expose the internal unauthenticated port for TSDProxy to handle authentication and encryption
@@ -40,5 +40,5 @@ volumes:
   frigate-config:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

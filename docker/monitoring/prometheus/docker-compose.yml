@@ -7,7 +7,7 @@ services:
       - ./config:/etc/prometheus:ro
       - prometheus-data:/prometheus
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
 
@@ -15,5 +15,5 @@ volumes:
   prometheus-data:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true

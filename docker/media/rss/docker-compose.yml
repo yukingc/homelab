@@ -16,7 +16,7 @@ services:
       - freshrss_data:/var/www/FreshRSS/data
       - freshrss_extensions:/var/www/FreshRSS/extensions
     networks:
-      - homelab-net
+      - tsdproxy-net
       - rss_internal
     labels:
       tsdproxy.enable: "true"
@@ -41,7 +41,7 @@ services:
       - ./rssbridge/whitelist.txt:/app/whitelist.txt:ro
       - ./rssbridge/config.ini.php:/app/config.ini.php:ro
     networks:
-      - homelab-net
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       tsdproxy.name: "rssbridge"
@@ -69,7 +69,7 @@ services:
       # TWITTER_USERNAME: ""
       # TWITTER_PASSWORD: ""
     networks:
-      - homelab-net
+      - tsdproxy-net
       - rss_internal
     depends_on:
       redis:
@@ -112,11 +112,11 @@ volumes:
 
 # ─────────────────────────────────────────────
 # Networks
-# homelab-net  — external, shared with your existing TSDProxy
+# tsdproxy-net  — external, shared with your existing TSDProxy
 # rss_internal — internal only, for DB/cache isolation
 # ─────────────────────────────────────────────
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true
   rss_internal:
     driver: bridge

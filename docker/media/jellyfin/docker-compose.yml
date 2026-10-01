@@ -10,7 +10,7 @@ services:
       - jellyfin-cache:/cache
       - ${MEDIA_ROOT}:/media
     networks:
-      - homelab-net
+      - tsdproxy-net
     restart: unless-stopped
     # expose:
     #   - "8096"  # Jellyfin's default HTTP port
@@ -29,5 +29,5 @@ volumes:
   jellyfin-cache:
 
 networks:
-  homelab-net:
+  tsdproxy-net:
     external: true
