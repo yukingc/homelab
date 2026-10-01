@@ -8,9 +8,11 @@ services:
     networks:
       - homelab-net
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:9443:9443"
     labels:
-      tsdproxy.enable: "true"
-      tsdproxy.container_port: "9000"
+      # tsdproxy.enable: "true"
+      # tsdproxy.container_port: "9000"
       homepage.group: "Monitoring & Management"
       homepage.name: "Portainer"
       homepage.icon: "portainer"
