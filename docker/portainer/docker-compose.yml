@@ -7,10 +7,10 @@ services:
       - portainer_data:/data
     restart: unless-stopped
     ports:
-      - "127.0.0.1:9443:9443"
+      - "127.0.0.1:9443:9443" # for tailscale serve as fallback if tsdproxy is down
     labels:
-      # tsdproxy.enable: "true"
-      # tsdproxy.container_port: "9000"
+      tsdproxy.enable: "true"
+      tsdproxy.container_port: "9000"
       homepage.group: "Monitoring & Management"
       homepage.name: "Portainer"
       homepage.icon: "portainer"
@@ -20,3 +20,7 @@ services:
 volumes:
   portainer_data:
     driver: local
+
+networks:
+  tsdproxy-net:
+    external: true
