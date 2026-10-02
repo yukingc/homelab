@@ -43,3 +43,5 @@ volumes:
 networks:
   tsdproxy-net:
     external: true
+  homepage-internal:
+    driver: bridge
