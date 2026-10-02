@@ -24,6 +24,7 @@ services:
       - HOMEPAGE_ALLOWED_HOSTS=gethomepage.dev,homepage.mulley-bonito.ts.net # required, may need port. See gethomepage.dev/installation/#homepage_allowed_hosts
       - PUID=501
       - PGID=20
+      - HOMEPAGE_DOCKER_INSTANCE=my-docker
     networks:
       - tsdproxy-net
     restart: unless-stopped
