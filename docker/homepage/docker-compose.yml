@@ -43,9 +43,6 @@ services:
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
-      # INLINE DOCKER CONFIG VIA LABELS:
-      # homepage.docker.my-docker.host: "dockerproxy"
-      # homepage.docker.my-docker.port: "2375"
 
 volumes:
   homepage-config:
