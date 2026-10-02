@@ -8,6 +8,8 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:9443:9443" # for tailscale serve as fallback if tsdproxy is down
+    networks:
+      - tsdproxy-net
     labels:
       tsdproxy.enable: "true"
       tsdproxy.container_port: "9000"
