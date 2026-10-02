@@ -10,7 +10,9 @@ services:
     ports:
       - 127.0.0.1:2375:2375
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Mounted as read-only
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - homepage-internal
     restart: unless-stopped
 
   homepage:
@@ -27,6 +29,7 @@ services:
       - HOMEPAGE_DOCKER_INSTANCE=my-docker
     networks:
       - tsdproxy-net
+      - homepage-internal
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
