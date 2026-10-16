@@ -1,13 +1,33 @@
 services:
+  # The Tailscale Sidecar Container
+  tailscale-portainer:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-portainer
+    hostname: portainer  # <-- This will be its name on your Tailnet
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_EXTRA_ARGS=--advertise-tags=tag:homelab # Optional: keeps the node from expiring
+      - TS_SERVE_CONFIG=/config/portainer.json
+    volumes:
+      - ./tailscale-state:/var/lib/tailscale
+      - ./config:/config
+      # - /dev/net/tun:/dev/net/tun # Required for Tailscale networking
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    restart: unless-stopped
+
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
+    depends_on:
+       - tailscale-portainer
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:9443:9443" # for tailscale serve as fallback if tsdproxy is down
+    network_mode: service:tailscale-portainer
     labels:
       homepage.group: "Monitoring & Management"
       homepage.name: "Portainer"

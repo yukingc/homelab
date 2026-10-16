@@ -11,55 +11,102 @@ other stack, including those on the Beelink (via the Portainer Agent).
 ## How access works
 
 ```
-browser --(tailnet)--> Mac mini Tailscale --(tailscale serve)--> 127.0.0.1:9443 --> Portainer
+browser --(tailnet)--> tailscale-portainer sidecar (node "portainer") --> 127.0.0.1:9443 --> Portainer
 ```
 
-- Portainer publishes its HTTPS port on **loopback only** (`127.0.0.1:9443`),
-  so nothing on the LAN can reach it directly.
-- The host's Tailscale fronts it with `tailscale serve`, giving a valid
-  certificate at `https://<mac-mini>.<tailnet>.ts.net`.
-- This path does **not** depend on tsdproxy, so a broken tsdproxy deploy
-  cannot lock you out.
-- Last-resort access: sit at the Mac mini and open `https://localhost:9443`
+- A **Tailscale sidecar container** (`tailscale-portainer`) joins the tailnet as
+  its own node, `portainer`. Portainer shares the sidecar's network namespace
+  (`network_mode: service:tailscale-portainer`), so the sidecar reaches it on
+  `127.0.0.1:9443`.
+- The sidecar terminates HTTPS with a Tailscale-issued certificate and proxies
+  to Portainer, using `serve.json` loaded through `TS_SERVE_CONFIG`. No
+  `tailscale serve` command is run on the host, and the host's Tailscale is not
+  involved in this path.
+- Portainer publishes **no ports** of its own. Nothing on the LAN can reach it
+  directly.
+- This path does **not** depend on tsdproxy, so a broken tsdproxy deploy cannot
+  lock you out.
+- URL: `https://portainer.<tailnet>.ts.net` (no port).
+- Last-resort access if the tailnet path is down: because Portainer has no
+  published ports, use `docker exec tailscale-portainer wget -qO-
+  --no-check-certificate https://127.0.0.1:9443 | head` to confirm Portainer
+  itself is up. For a browser fallback, publish `127.0.0.1:9443:9443` on the
+  **sidecar** service (not on Portainer) and open `https://localhost:9443`
   (expect a self-signed certificate warning).
 
 The compose file in this folder is expected to contain:
 
 - `name: portainer` at the top (keeps volume names stable)
-- a pinned image version, not `latest`
-- `restart: unless-stopped`
-- `ports: ["127.0.0.1:9443:9443"]`
+- a pinned Portainer image version, not `latest`
+- `restart: unless-stopped` on both services
+- a `tailscale-portainer` service (`tailscale/tailscale`) with `hostname:
+  portainer`, and the environment variables `TS_AUTHKEY`, `TS_STATE_DIR`,
+  `TS_SERVE_CONFIG=/config/serve.json` and `TS_USERSPACE`
+- a persistent state volume for the sidecar (`./ts-state:/var/lib/tailscale`),
+  so the node identity and certificate survive recreates
+- `./serve.json:/config/serve.json:ro` mounted into the sidecar
+- the Portainer service with `network_mode: service:tailscale-portainer` and
+  **no** `ports:` entry
 - the Docker socket mount and a `portainer-data` volume mounted at `/data`
+
+`serve.json`:
+
+```json
+{
+  "TCP": { "443": { "HTTPS": true } },
+  "Web": {
+    "${TS_CERT_DOMAIN}:443": {
+      "Handlers": { "/": { "Proxy": "https+insecure://127.0.0.1:9443" } }
+    }
+  }
+}
+```
+
+`https+insecure://` is needed because Portainer's own certificate is
+self-signed. If the sidecar logs `could not connect to local backend server at
+127.0.0.1:443`, the serve config was not loaded.
+
+## Prerequisites
+
+- **HTTPS Certificates** enabled in the Tailscale admin console (DNS tab)
+- A Tailscale auth key (reusable, or an OAuth client), passed as `TS_AUTHKEY`
+- `serve.json` next to the compose file
 
 ## First-time setup
 
-1. Start the stack (from this folder):
+1. Start the stack (from this folder), supplying the auth key:
    ```bash
-   docker compose up -d
+   TS_AUTHKEY=xxx docker compose up -d
    ```
-2. Check it is listening locally: open `https://localhost:9443` and create the
-   admin user. Do this promptly, since an unconfigured Portainer times out its
-   initial setup and needs a restart.
-3. Expose it on the tailnet (once; `--bg` makes it persistent):
+2. Check the sidecar joined the tailnet and is serving:
    ```bash
-   tailscale serve --bg https+insecure://127.0.0.1:9443
-   tailscale serve status
+   docker exec tailscale-portainer tailscale status --self
+   docker exec tailscale-portainer tailscale serve status
    ```
-   Flags can differ between Tailscale versions. If the command is rejected,
-   check `tailscale serve --help`.
-4. Open `https://<mac-mini>.<tailnet>.ts.net`.
+   `serve status` should show `https://portainer.<tailnet>.ts.net` proxying to
+   `https+insecure://127.0.0.1:9443`.
+3. Open `https://portainer.<tailnet>.ts.net` and create the admin user. Do this
+   promptly, since an unconfigured Portainer times out its initial setup and
+   needs a restart. The very first load can take about 30 seconds (and may show
+   a certificate warning) while the certificate is issued; wait, fully reload,
+   and it clears.
 
-To remove the serve mapping later: `tailscale serve reset`.
+The auth key is only needed on first start. Node state is persisted in
+`./ts-state`, so later runs can use plain `docker compose up -d`.
+
+To remove it later: `docker compose down`, then delete the `portainer` node in
+the Tailscale admin console.
 
 ## Day-to-day
 
 ```bash
 docker compose ps
 docker compose logs -f portainer
+docker compose logs -f tailscale-portainer
 
 # Upgrade: bump the pinned image tag in compose.yaml, then
 docker compose pull
-docker compose up -d
+docker compose up -d   # no auth key needed once ./ts-state exists
 ```
 
 ## Adding another host (Portainer Agent)
@@ -81,8 +128,14 @@ services:
 Then in Portainer: **Environments > Add environment > Docker Standalone >
 Agent**, and enter `<tailscale-ip-or-name>:9001`.
 
-- The agent has full control of that host's Docker. Allow only the Mac mini to
-  reach port 9001 with a Tailscale ACL.
+- The agent has full control of that host's Docker. Allow only the `portainer`
+  node (the sidecar, not the Mac mini host) to reach port 9001 with a Tailscale
+  ACL.
+- The sidecar's network namespace is what Portainer dials out from. In
+  **userspace** mode (`TS_USERSPACE=true`) Portainer cannot open connections to
+  tailnet addresses directly. If agents on other hosts show as down, switch the
+  sidecar to tun mode (`TS_USERSPACE=false`, `devices: ["/dev/net/tun"]`,
+  `cap_add: [NET_ADMIN]`).
 - If binding to the Tailscale IP fails (for example Docker starts before
   Tailscale does), publish `9001:9001` and rely on the ACL instead.
 - Keep the agent version in step with the server version.
@@ -122,21 +175,36 @@ least once, and store backups off this machine.
 
 ## After a reboot
 
-The Mac mini needs these to come back on their own:
+The Mac mini needs this to come back on its own:
 
-1. Tailscale is running (the macOS app starts at login, so check that
-   auto-login or an equivalent is set up).
-2. Docker (Docker Desktop, OrbStack, or Colima) is set to start at login or
-   boot. Portainer then returns via `restart: unless-stopped`.
-3. `tailscale serve status` still shows the mapping.
+1. Docker (Docker Desktop, OrbStack, or Colima) is set to start at login or
+   boot. The sidecar and Portainer then return via `restart: unless-stopped`.
+2. `docker exec tailscale-portainer tailscale serve status` still shows the
+   mapping.
+
+The host's Tailscale app is not needed for this stack, since the sidecar is its
+own node.
 
 ## Troubleshooting
 
 - **Portainer UI says setup timed out:** `docker compose restart portainer`,
   then create the admin user.
-- **Tailnet URL fails but `https://localhost:9443` works:** check
-  `tailscale status` and `tailscale serve status`.
-- **Both fail:** check `docker compose ps` and the logs.
+- **Page does not load, sidecar logs `connection refused` to
+  `127.0.0.1:443`:** the serve config is not loaded. Check that `serve.json` is
+  mounted at the path `TS_SERVE_CONFIG` names, then `docker compose up -d
+  --force-recreate`.
+- **"Connection is not private" on first visit:** the certificate is still
+  being issued. Wait about 30 seconds, quit and reopen the browser, and use the
+  URL with no port. Make sure HTTPS Certificates is enabled in the admin
+  console.
+- **Node shows up as `portainer-1`:** an old node with the same name is still
+  registered. Delete the stale one in the admin console and keep
+  `TS_STATE_DIR` persisted.
+- **Sidecar will not join the tailnet:** check `docker logs
+  tailscale-portainer` for `invalid key` (expired or used auth key) or
+  `/dev/net/tun` errors.
+- **Tailnet URL fails:** check `docker compose ps`, the sidecar logs, and
+  `docker exec tailscale-portainer tailscale serve status`.
 - **Beelink environment shows as down:** check Tailscale and Docker on the
-  Beelink, the agent container, and that the ACL allows the Mac mini to reach
-  port 9001.
+  Beelink, the agent container, the sidecar's networking mode (see the agent
+  section), and that the ACL allows the `portainer` node to reach port 9001.
