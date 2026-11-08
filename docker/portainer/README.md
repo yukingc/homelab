@@ -1,11 +1,10 @@
 # Portainer (bootstrap stack)
 
-Portainer Server for the homelab. It runs on the Mac mini and manages every
-other stack, including those on the Beelink (via the Portainer Agent).
+Portainer Server for the homelab. It runs on a primary dedicated host machine (e.g., Beelink or Mac Mini) and manages every other stack, including those on external hosts (via the Portainer Agent).
 
 > **Rule: this stack is never deployed from Portainer itself.**
 > It is the tool that manages the other stacks, so it is started and updated
-> from the command line. Redeploying it from its own UI would cut off the
+> from the command line on the primary host. Redeploying it from its own UI would cut off the
 > session mid-deploy and could lock you out.
 
 ## How access works
@@ -111,33 +110,28 @@ docker compose up -d   # no auth key needed once ./ts-state exists
 
 ## Adding another host (Portainer Agent)
 
-On the new machine (Linux, or Docker inside WSL2 on the Beelink):
+On the external or secondary machine (Linux, or Docker Desktop inside WSL2 on a Windows host), run the agent container standalone using `docker run`:
 
-```yaml
-services:
-  agent:
-    image: portainer/agent:<same version as the server>
-    restart: unless-stopped
-    ports:
-      - "<tailscale-ip-of-this-host>:9001:9001"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/volumes:/var/lib/docker/volumes
+```bash
+docker run -d \
+  -p 9001:9001   --name portainer_agent \
+  --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /var/lib/docker/volumes:/var/lib/docker/volumes \
+  portainer/agent:<same version as the server>
 ```
 
-Then in Portainer: **Environments > Add environment > Docker Standalone >
-Agent**, and enter `<tailscale-ip-or-name>:9001`.
+*Note for Mac Mini hosts:* If running Docker Desktop on macOS, the agent may need to connect to the internal virtual machine network. If standard routing fails, append `-e AGENT_CLUSTER_ADDR=host.docker.internal` to the command above and ensure "Allow default Docker socket" is checked in your Docker Desktop advanced settings.
+
+Then in Portainer: Go to **Environments > Add environment > Docker Standalone > Agent**, and enter `<tailscale-ip-or-name-of-this-host>:9001`.
 
 - The agent has full control of that host's Docker. Allow only the `portainer`
-  node (the sidecar, not the Mac mini host) to reach port 9001 with a Tailscale
-  ACL.
+  node (the sidecar, not the host machine itself) to reach port 9001 with a Tailscale ACL.
 - The sidecar's network namespace is what Portainer dials out from. In
   **userspace** mode (`TS_USERSPACE=true`) Portainer cannot open connections to
   tailnet addresses directly. If agents on other hosts show as down, switch the
   sidecar to tun mode (`TS_USERSPACE=false`, `devices: ["/dev/net/tun"]`,
   `cap_add: [NET_ADMIN]`).
-- If binding to the Tailscale IP fails (for example Docker starts before
-  Tailscale does), publish `9001:9001` and rely on the ACL instead.
 - Keep the agent version in step with the server version.
 
 ## Per-host values and secrets
@@ -175,15 +169,13 @@ least once, and store backups off this machine.
 
 ## After a reboot
 
-The Mac mini needs this to come back on its own:
+The primary host needs this to come back on its own:
 
-1. Docker (Docker Desktop, OrbStack, or Colima) is set to start at login or
-   boot. The sidecar and Portainer then return via `restart: unless-stopped`.
+1. The Docker daemon is set to start automatically at login or boot. The sidecar and Portainer then return via `restart: unless-stopped`.
 2. `docker exec tailscale-portainer tailscale serve status` still shows the
    mapping.
 
-The host's Tailscale app is not needed for this stack, since the sidecar is its
-own node.
+The host's native Tailscale app is not required for this stack, since the sidecar acts as its own autonomous node.
 
 ## Troubleshooting
 
@@ -205,6 +197,4 @@ own node.
   `/dev/net/tun` errors.
 - **Tailnet URL fails:** check `docker compose ps`, the sidecar logs, and
   `docker exec tailscale-portainer tailscale serve status`.
-- **Beelink environment shows as down:** check Tailscale and Docker on the
-  Beelink, the agent container, the sidecar's networking mode (see the agent
-  section), and that the ACL allows the `portainer` node to reach port 9001.
+- **Target environment shows as down:** check Tailscale and Docker on the remote machine, the agent container state, the sidecar's networking mode (see the agent section), and verify that the Tailscale ACL allows the `portainer` node to reach port 9001.
