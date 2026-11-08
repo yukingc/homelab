@@ -20,8 +20,8 @@ services:
         read_only: true
         bind:
           create_host_path: false
-    networks:
-      - tsdproxy-net
+    # networks:
+    #  - tsdproxy-net
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
@@ -36,9 +36,9 @@ services:
     # ports:
     #   - "4533:4533"  # Optional, if you want to access it directly via localhost
 
-networks:
-  tsdproxy-net:
-    external: true
+# networks:
+#   tsdproxy-net:
+#     external: true
 
 volumes:
   navidrome-data:
