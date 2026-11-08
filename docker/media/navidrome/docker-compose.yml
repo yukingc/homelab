@@ -24,7 +24,7 @@ services:
     #  - tsdproxy-net
     restart: unless-stopped
     labels:
-      tsdproxy.enable: "true"
+    #   tsdproxy.enable: "true"
       homepage.group: "Media"
       homepage.name: "Navidrome"
       homepage.icon: "navidrome"
