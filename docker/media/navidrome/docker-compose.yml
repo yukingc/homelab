@@ -20,6 +20,8 @@ services:
         read_only: true
         bind:
           create_host_path: false
+		ports:
+			- "127.0.0.1:4533:4533"
     # networks:
     #  - tsdproxy-net
     restart: unless-stopped
