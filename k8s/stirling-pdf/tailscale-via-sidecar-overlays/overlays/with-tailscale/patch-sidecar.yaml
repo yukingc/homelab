@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stirling-pdf
+spec:
+  template:
+    spec:
+      containers:
+        # Kustomize will merge this sidecar container into the existing containers list
+        - name: tailscale
+          image: tailscale/tailscale:latest
+          env:
+            - name: TS_AUTHKEY
+              valueFrom:
+                secretKeyRef:
+                  name: tailscale-auth
+                  key: TS_AUTHKEY
+            - name: TS_HOSTNAME
+              value: "k-stirling-pdf"
+            - name: TS_USERSPACE
+              value: "true"
+            - name: TS_SERVE_CONFIG
+              value: /etc/tailscale/serve.json
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+          volumeMounts:
+            - name: tailscale-storage
+              mountPath: /var/lib/tailscale
+            - name: serve-config
+              mountPath: /etc/tailscale
+      volumes:
+        - name: tailscale-storage
+          emptyDir: {}
+        - name: serve-config
+          configMap:
+            name: tailscale-serve-config
