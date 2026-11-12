@@ -14,8 +14,8 @@ services:
       - /dev/net/tun:/dev/net/tun
     cap_add:
       - NET_ADMIN
-    ports:
-      - "3000:3000"                           # first-run setup wizard only; remove after setup
+    # ports:
+    #   - "3000:3000"                           # first-run setup wizard only; remove after setup
     restart: unless-stopped
 
   adguard:
