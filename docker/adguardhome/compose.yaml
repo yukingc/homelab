@@ -1,0 +1,33 @@
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: ts-adguard
+    hostname: adguard            # shows up as "adguard" in your tailnet
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}              # put in .env (tagged, reusable key)
+      - TS_EXTRA_ARGS=--advertise-tags=tag:dns
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_ACCEPT_DNS=false                   # don't let the sidecar use tailnet DNS (avoids a loop)
+    volumes:
+      - ts-state:/var/lib/tailscale           # persistent state keeps the 100.x IP stable
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "3000:3000"                           # first-run setup wizard only; remove after setup
+    restart: unless-stopped
+
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    network_mode: service:tailscale           # shares the sidecar's network namespace
+    depends_on:
+      - tailscale
+    volumes:
+      - ./adguard/work:/opt/adguardhome/work
+      - ./adguard/conf:/opt/adguardhome/conf
+    restart: unless-stopped
+
+volumes:
+  ts-state:
