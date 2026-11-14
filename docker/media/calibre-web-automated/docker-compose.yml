@@ -22,10 +22,8 @@ services:
         target: /calibre-library
         bind:
           create_host_path: false
-    networks:
-      - tsdproxy-net
-    # ports:
-    #   - 8083:8083 
+    ports:
+      - "127.0.0.1:8083:8083"
     restart: unless-stopped
     labels:
       tsdproxy.enable: "true"
@@ -39,7 +37,3 @@ services:
 
 volumes:
   calibre-web-automated-config:
-
-networks:
-  tsdproxy-net:
-    external: true
