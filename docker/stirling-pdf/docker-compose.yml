@@ -6,11 +6,9 @@ services:
     volumes:
       - stirling-configs:/configs
     restart: unless-stopped
-    networks:
-      - tsdproxy-net
+    ports:
+      - "127.0.0.1:8080:8080"
     labels:
-      tsdproxy.enable: "true"
-      tsdproxy.container_port: "8080"
       homepage.group: "Utilities"
       homepage.name: "Stirling PDF"
       homepage.icon: "stirling-pdf"
@@ -19,7 +17,3 @@ services:
 
 volumes:
   stirling-configs:
-
-networks:
-  tsdproxy-net:
-    external: true
